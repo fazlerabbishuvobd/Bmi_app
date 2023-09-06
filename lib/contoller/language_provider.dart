@@ -9,15 +9,15 @@ class LanguageProvider extends ChangeNotifier{
     notifyListeners();
   }
 
-  Locale _locale =  Locale('en');
+  Locale _locale =  const Locale('en');
   Locale get locale => _locale;
   void changeLanguage(bool value){
     if(value==false)
       {
-        _locale = Locale('en');
+        _locale = const Locale('en');
       }
     else{
-      _locale = Locale('bn');
+      _locale = const Locale('bn');
     }
     notifyListeners();
   }

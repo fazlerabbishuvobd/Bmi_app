@@ -20,89 +20,91 @@ class _SelectWeightState extends State<SelectWeight> {
 
   @override
   Widget build(BuildContext context) {
+
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: const Icon(
-              Icons.arrow_back,
-              color: Colors.white,
-            )),
-        title: Text(
-          AppLocalizations.of(context).weightChoose,
-          style: customBodyText(Colors.white, 20, FontWeight.bold),
+      appBar: _buildAppBar(context),
+      body: Container(
+        padding: const EdgeInsets.all(10),
+        alignment: Alignment.center,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            _buildImage(height),
+            _buildSleekSlider(),
+            const Spacer(),
+            _buildCalculateButton(width),
+          ],
         ),
-        centerTitle: true,
-        backgroundColor: AppBarTheme.of(context).backgroundColor,
       ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              // <----------------- IMAGE ----------------------->
-              SizedBox(
-                height: height * 0.45,
-                width: 200,
-                child: Image.asset(
-                  widget.gender == 'Male'
-                      ? 'assets/images/man.png'
-                      : 'assets/images/woman.png',
-                ),
-              ),
+    );
+  }
 
-              // <----------------- SLEEK CIRCULAR SLIDER ----------------------->
-              Consumer<BMIProvider>(
-                builder: (context, sleekProvider, child) => SleekCircularSlider(
-                  max: 300,
-                  min: 0,
-                  initialValue: 50,
-                  onChange: (value) {
-                    sleekProvider.getSliderValue(value);
-                  },
-                  appearance: CircularSliderAppearance(
-                    size: 200,
-                    customColors: CustomSliderColors(
-                      progressBarColor: Colors.amber,
-                      trackColor: Colors.amber.shade200,
-                    ),
-                    infoProperties: InfoProperties(
-                      modifier: (percentage) =>
-                          '${sleekProvider.currentSliderValue.toStringAsFixed(1)} KG',
-                    ),
-                  ),
-                ),
-              ),
-              const Spacer(),
+  AppBar _buildAppBar(BuildContext context) {
+    return AppBar(
+      leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          }, icon: const Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          )
+      ),
+      title: Text(
+        AppLocalizations.of(context)!.weightChoose,
+        style: customBodyText(Colors.white, 20, FontWeight.bold),
+      ),
+      centerTitle: true,
+      backgroundColor: AppBarTheme.of(context).backgroundColor,
+    );
+  }
 
-              // <----------------- NEXT BUTTON ----------------------->
-              Consumer<BMIProvider>(
-                builder: (context, navProvider, child) => customButton(
-                    onPressed: () {
-                      Navigator.of(context).pushAndRemoveUntil(
-                        MaterialPageRoute(
-                            builder: (context) => ResultPage(
-                                  ww: navProvider.currentSliderValue,
-                                  hw: widget.h,
-                                )),
-                        (route) => false,
-                      );
-                    },
-                    buttonTxt: AppLocalizations.of(context).calculateBMI,
-                    icons: Icons.calculate_outlined,
-                    height: 56,
-                    width: width,
-                    color: Colors.amber),
-              ),
-            ],
+  Consumer<BMIProvider> _buildSleekSlider() {
+    return Consumer<BMIProvider>(
+      builder: (context, sleekProvider, child) => SleekCircularSlider(
+        max: 250,
+        min: 0,
+        initialValue: 50,
+        onChange: (value) {
+          sleekProvider.getSliderValue(value);
+        },
+        appearance: CircularSliderAppearance(
+          size: 250,
+          customColors: CustomSliderColors(
+            progressBarColor: Colors.amber,
+            trackColor: Colors.amber.shade200,
+          ),
+          infoProperties: InfoProperties(
+            modifier: (percentage) => '${sleekProvider.currentSliderValue.toStringAsFixed(1)}KG',
           ),
         ),
+      ),
+    );
+  }
+
+  Consumer<BMIProvider> _buildCalculateButton(double width) {
+    return Consumer<BMIProvider>(
+      builder: (context, navProvider, child) => customButton(
+      onPressed: () {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) =>
+              ResultPage(ww: navProvider.currentSliderValue, hw: widget.h,)), (route) => false,);
+      },
+      buttonTxt: AppLocalizations.of(context)!.calculateBMI,
+      icons: Icons.calculate_outlined,
+      height: 56,
+      width: width,
+      color: Colors.amber),
+    );
+  }
+
+  Widget _buildImage(double height) {
+    return SizedBox(
+      height: height * 0.45,
+      width: 200,
+      child: Image.asset(widget.gender == 'Male' ? 'assets/images/man.png' : 'assets/images/woman.png',
       ),
     );
   }

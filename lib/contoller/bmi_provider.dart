@@ -1,4 +1,3 @@
-import 'package:bmi_calculator_app/widgets/custom_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -32,6 +31,7 @@ class BMIProvider extends ChangeNotifier {
 
   double _cmSlider = 150;
   double get cmSlider => _cmSlider;
+
   void getCmSliderValue(value) {
       _cmSlider = value;
       notifyListeners();

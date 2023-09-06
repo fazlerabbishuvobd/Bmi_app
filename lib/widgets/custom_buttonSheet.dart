@@ -27,7 +27,7 @@ void showBottomSheets(
                     )),
               ),
               Text(
-                AppLocalizations.of(context).shareFile,
+                AppLocalizations.of(context)!.shareFile,
                 style: customBodyText(Colors.black, 25, FontWeight.bold),
               ),
               const SizedBox(
@@ -39,14 +39,14 @@ void showBottomSheets(
                   Expanded(
                       child: customButton(
                           onPressed: onpressed1,
-                          buttonTxt: AppLocalizations.of(context).textButton,
+                          buttonTxt: AppLocalizations.of(context)!.textButton,
                           icons: Icons.text_fields_outlined,
                           color: Colors.amber,
                           height: 56)),
                   Expanded(
                       child: customButton(
                           onPressed: onpressed2,
-                          buttonTxt: AppLocalizations.of(context).scButton,
+                          buttonTxt: AppLocalizations.of(context)!.scButton,
                           icons: Icons.screenshot_outlined,
                           color: Colors.amber,
                           height: 56)),

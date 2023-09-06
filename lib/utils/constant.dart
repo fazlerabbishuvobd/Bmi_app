@@ -110,20 +110,20 @@ String netWeight(double value,double h) {
 
 String getMassage(double value,BuildContext context) {
   if (0 <= value && value < 16) {
-    return AppLocalizations.of(context).n1Details;
+    return AppLocalizations.of(context)!.n1Details;
   } else if (16 <= value && value < 17) {
-    return AppLocalizations.of(context).n2Details;
+    return AppLocalizations.of(context)!.n2Details;
   } else if (17 <= value && value < 18.5) {
-    return AppLocalizations.of(context).n3Details;
+    return AppLocalizations.of(context)!.n3Details;
   } else if (18.5 <= value && value < 25) {
-    return AppLocalizations.of(context).n4Details;
+    return AppLocalizations.of(context)!.n4Details;
   } else if (25 <= value && value < 30) {
-    return AppLocalizations.of(context).n5Details;
+    return AppLocalizations.of(context)!.n5Details;
   } else if (30 <= value && value < 35) {
-    return AppLocalizations.of(context).n6Details;
+    return AppLocalizations.of(context)!.n6Details;
   } else if (35 <= value && value < 40) {
-    return AppLocalizations.of(context).n7Details;
+    return AppLocalizations.of(context)!.n7Details;
   } else {
-    return AppLocalizations.of(context).n8Details;
+    return AppLocalizations.of(context)!.n8Details;
   }
 }
