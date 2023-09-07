@@ -1,10 +1,10 @@
 import 'package:bmi_calculator_app/contoller/bmi_provider.dart';
 import 'package:bmi_calculator_app/contoller/language_provider.dart';
 import 'package:bmi_calculator_app/contoller/theme_provider.dart';
+import 'package:bmi_calculator_app/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:bmi_calculator_app/screens/userinfo.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -41,7 +41,8 @@ class MyApp extends StatelessWidget {
             theme: _buildLightThemeData(),
             darkTheme: _buildDarkThemeData(),
             themeMode: themeProvider.themeMode,
-            home: const UserInfoPage(),
+            //home: const UserInfoPage(),
+            home: const SplashScreen(),
         ),
       ),
     );
