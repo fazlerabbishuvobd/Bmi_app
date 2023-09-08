@@ -43,16 +43,19 @@ class _SelectHeightState extends State<SelectHeight> {
             icon: const Icon(
               Icons.arrow_back,
               color: Colors.white,
-            )),
+            )
+        ),
         title: Text(AppLocalizations.of(context)!.heightChoose, style: customBodyText(Colors.white, 20, FontWeight.bold)),
         centerTitle: true,
         backgroundColor: AppBarTheme.of(context).backgroundColor,
       ),
+
       body: Container(
         padding: const EdgeInsets.all(10),
         child: Column(
           children: [
-            /// Top Part
+
+            // Top Part
             Container(
               alignment: Alignment.center,
               width: width * 0.8,
@@ -65,16 +68,50 @@ class _SelectHeightState extends State<SelectHeight> {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
 
-                  // <----------------- BUTTON INCREASE DECREASE ----------------------->
+                  // Increase Decrease Button
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _buildDecreaseButton(isCM, heightProviders, context),
+
+                      // Decrease
+                      Card(
+                        elevation: 5,
+                        color: Colors.red,
+                        child: IconButton(
+                            style: IconButton.styleFrom(
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))
+                            ),
+                            onPressed: () {
+                              if ( isCM ? heightProviders.cmSlider > 0 : heightProviders.feetSlider > 0 ) {
+                                isCM ? heightProviders.decreaseCM() : heightProviders.decreaseFeet();
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(_buildSnackBarCM(isCM, context));
+                              }
+                            },
+                            icon: const Icon(Icons.remove)),
+                      ),
 
                       Text(isCM ? '${_currentSliderValue.toStringAsFixed(1)} ${AppLocalizations.of(context)!.cm}' : '${_currentSliderValue.toStringAsFixed(1)} ${AppLocalizations.of(context)!.feet}',
                           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
 
-                      _buildIncreaseButton(isCM, heightProviders, context),
+                      //Increase Button
+                      Card(
+                        elevation: 5,
+                        color: Colors.green,
+                        child: IconButton(
+                          style: IconButton.styleFrom(backgroundColor: Colors.green,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))
+                          ),
+                          onPressed: () {
+                            if (isCM ? 0 < heightProviders.cmSlider && heightProviders.cmSlider < 260 : 0 < heightProviders.feetSlider && heightProviders.feetSlider < 10) {
+                              isCM ? heightProviders.increaseCM() : heightProviders.increaseFeet();
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(_buildCMSnackBar(isCM, context));
+                            }
+                          },
+                          icon: const Icon(Icons.add)
+                        ),
+                      ),
                     ],
                   ),
 
@@ -84,7 +121,7 @@ class _SelectHeightState extends State<SelectHeight> {
               ),
             ),
 
-            // <-----------------BMI Result Circular Indicator----------------------->
+            // BMI Result Circular Indicator
             SizedBox(
               height: height * 0.65,
               width: width * 0.9,
@@ -92,54 +129,131 @@ class _SelectHeightState extends State<SelectHeight> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
+
                   /// Button
                   Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        _buildCMButton(),
-                        _buildFeetButton(),
+
+                        //CM Button
+                        Consumer<BMIProvider>(
+                          builder: (context, heightProvider, child) =>
+                              SizedBox(
+                              child: customButton(
+                                onPressed: () {
+                                  heightProvider.checkIsCM();
+                                },
+                                buttonTxt: AppLocalizations.of(context)!.cm,
+                                icons: Icons.height,
+                                height: 56,
+                                width: 100,
+                              )
+                          ),
+                        ),
+
+                        //Feet Button
+                        Consumer<BMIProvider>(
+                          builder: (context, heightProvider, child) =>
+                              SizedBox(
+                                  child: customButton(
+                                    onPressed: () {
+                                      heightProvider.checkIsCM();
+                                    },
+                                    buttonTxt: AppLocalizations.of(context)!.feet,
+                                    icons: Icons.height,
+                                    height: 56,
+                                    width: 100,
+                                  )
+                              ),
+                        ),
                       ],
                     ),
                   ),
 
-                  ///Slider
+
+                  // Slider CM and Feet
                   RotatedBox(
                     quarterTurns: 3,
-                    child: isCM ? _buildCMSlider(width, heightProviders) : _buildFeetSlider(width, heightProviders, context),
+                    child: isCM ? SizedBox(
+                        width: width,
+                        child: SfSlider(
+                          min: 10,
+                          value: heightProviders.cmSlider,
+                          max: 260,
+                          onChanged: (value) {
+                            heightProviders.getCmSliderValue(value);
+                          },
+                          interval: 50,
+                          showTicks: true,
+                          showLabels: true,
+                          enableTooltip: true,
+                        )
+                    ):SizedBox(
+                        width: width,
+                        child: SfSlider(
+                          min: 0,
+                          value: heightProviders.feetSlider,
+                          max: 10,
+                          onChanged: (value) {
+                            if (value < 11) {
+                              heightProviders.getFeetSliderValue(value);
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      backgroundColor: Colors.white,
+                                      content: Container(
+                                        alignment: Alignment.center,
+                                        width: double.infinity,
+                                        height: 50,
+                                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.deepPurple),
+                                        child: Text(AppLocalizations.of(context)!.snackbarFh,
+                                          style: customBodyText(Colors.yellow, 16, FontWeight.bold),
+                                        ),
+                                      )
+                                  )
+                              );
+                            }
+                          },
+                          interval: 2,
+                          showTicks: true,
+                          showLabels: true,
+                          enableTooltip: true,
+                        )
+                    ),
                   ),
 
-                  _buildImage(height, isCM)
+                  //Male Female Image
+                  SizedBox(
+                    height: height,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Image.asset(widget.gender == 'Male' ? 'assets/images/man.png' : 'assets/images/woman.png',
+                          height: isCM ? _currentSliderValue * 1.65 : _currentSliderValue * 40,
+                        ),
+                      ],
+                    ),
+                  )
                 ],
               ),
             ),
             const Spacer(),
 
-            _buildNextButton(context, isCM, cmTometer, feetTometer, width)
+            //Next Button
+            customButton(
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => SelectWeight(gender: widget.gender, h: isCM ? cmTometer : feetTometer,)));
+              },
+              buttonTxt: AppLocalizations.of(context)!.nextButton,
+              icons: Icons.skip_next,
+              height: 56,
+              width: width,
+              color: Colors.amber)
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildDecreaseButton(bool isCM, BMIProvider heightProviders, BuildContext context) {
-    return Card(
-      elevation: 5,
-      color: Colors.red,
-      child: IconButton(
-          style: IconButton.styleFrom(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15)
-              )
-          ),
-          onPressed: () {
-            if ( isCM ? heightProviders.cmSlider > 0 : heightProviders.feetSlider > 0 ) {
-              isCM ? heightProviders.decreaseCM() : heightProviders.decreaseFeet();
-            } else {
-              ScaffoldMessenger.of(context).showSnackBar(_buildSnackBarCM(isCM, context));
-            }
-          },
-          icon: const Icon(Icons.remove)),
     );
   }
 
@@ -160,27 +274,6 @@ class _SelectHeightState extends State<SelectHeight> {
   );
   }
 
-  Widget _buildIncreaseButton(bool isCM, BMIProvider heightProviders, BuildContext context) {
-    return Card(
-      elevation: 5,
-      color: Colors.green,
-      child: IconButton(
-          style: IconButton.styleFrom(
-              backgroundColor: Colors.green,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15)
-              )
-          ),
-          onPressed: () {
-            if (isCM ? 0 < heightProviders.cmSlider && heightProviders.cmSlider < 260 : 0 < heightProviders.feetSlider && heightProviders.feetSlider < 10) {
-              isCM ? heightProviders.increaseCM() : heightProviders.increaseFeet();
-            } else {
-              ScaffoldMessenger.of(context).showSnackBar(_buildCMSnackBar(isCM, context));
-            }
-          },
-          icon: const Icon(Icons.add)),
-    );
-  }
 
   SnackBar _buildCMSnackBar(bool isCM, BuildContext context) {
     return SnackBar(
@@ -189,137 +282,12 @@ class _SelectHeightState extends State<SelectHeight> {
           alignment: Alignment.center,
           width: double.infinity,
           height: 50,
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              color: Colors.deepPurple),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.deepPurple),
           child: Text(
             isCM ? AppLocalizations.of(context)!.snackbarHh : AppLocalizations.of(context)!.snackbarFh,
             style: customBodyText(Colors.yellow,
                 16, FontWeight.bold),
           ),
-        )
-    );
-  }
-
-  Widget _buildNextButton(BuildContext context, bool isCM, double cmTometer, double feetTometer, double width) {
-    return customButton(
-      onPressed: () {
-        Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) =>
-            SelectWeight(
-              gender: widget.gender,
-              h: isCM ? cmTometer : feetTometer,
-            )
-          )
-        );
-      },
-      buttonTxt: AppLocalizations.of(context)!.nextButton,
-      icons: Icons.skip_next,
-      height: 56,
-      width: width,
-      color: Colors.amber);
-  }
-
-  Consumer<BMIProvider> _buildFeetButton() {
-    return Consumer<BMIProvider>(
-      builder: (context, heightProvider, child) =>
-        SizedBox(
-          child: customButton(
-            onPressed: () {
-            heightProvider.checkIsCM();
-          },
-          buttonTxt: AppLocalizations.of(context)!.feet,
-          icons: Icons.height,
-          height: 56,
-          width: 100,
-        )
-      ),
-    );
-  }
-
-  Consumer<BMIProvider> _buildCMButton() {
-    return Consumer<BMIProvider>(
-      builder: (context, heightProvider, child) => SizedBox(
-          child: customButton(
-        onPressed: () {
-          heightProvider.checkIsCM();
-        },
-        buttonTxt: AppLocalizations.of(context)!.cm,
-        icons: Icons.height,
-        height: 56,
-        width: 100,
-      )
-      ),
-    );
-  }
-
-  Widget _buildImage(double height, bool isCM) {
-    return SizedBox(
-      height: height,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Image.asset(
-            widget.gender == 'Male' ? 'assets/images/man.png' : 'assets/images/woman.png',
-            height: isCM ? _currentSliderValue * 1.65 : _currentSliderValue * 40,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFeetSlider(double width, BMIProvider heightProviders, BuildContext context) {
-    return SizedBox(
-      width: width,
-      child: SfSlider(
-        min: 0,
-        value: heightProviders.feetSlider,
-        max: 10,
-        onChanged: (value) {
-          if (value < 11) {
-            heightProviders.getFeetSliderValue(value);
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                    backgroundColor: Colors.white,
-                    content: Container(
-                      alignment: Alignment.center,
-                      width: double.infinity,
-                      height: 50,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Colors.deepPurple),
-                      child: Text(
-                        AppLocalizations.of(context)!.snackbarFh,
-                        style: customBodyText(Colors.yellow, 16, FontWeight.bold),
-                      ),
-                    )
-              )
-            );
-          }
-        },
-        interval: 2,
-        showTicks: true,
-        showLabels: true,
-        enableTooltip: true,
-      )
-    );
-  }
-
-  Widget _buildCMSlider(double width, BMIProvider heightProviders) {
-    return SizedBox(
-        width: width,
-        child: SfSlider(
-          min: 10,
-          value: heightProviders.cmSlider,
-          max: 260,
-          onChanged: (value) {
-            heightProviders.getCmSliderValue(value);
-          },
-          interval: 50,
-          showTicks: true,
-          showLabels: true,
-          enableTooltip: true,
         )
     );
   }

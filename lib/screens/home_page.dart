@@ -19,9 +19,14 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-
-    final height = MediaQuery.of(context).size.height;
-    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery
+        .of(context)
+        .size
+        .height;
+    final width = MediaQuery
+        .of(context)
+        .size
+        .width;
 
     return Scaffold(
       appBar: AppBar(
@@ -36,78 +41,83 @@ class _HomePageState extends State<HomePage> {
           style: customBodyText(Colors.white, 22, FontWeight.bold),
         ),
         centerTitle: true,
-        backgroundColor: AppBarTheme.of(context).backgroundColor,
+        backgroundColor: AppBarTheme
+            .of(context)
+            .backgroundColor,
       ),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(10),
           child: Consumer<BMIProvider>(
-            builder: (context, bmiProvider, child) => Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _buildImage(height, width, bmiProvider),
+            builder: (context, bmiProvider, child) =>
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
 
-                _buildMFButton(bmiProvider, context),
-                const Spacer(),
+                    /// Image
+                    SizedBox(
+                      height: height * 0.50,
+                      width: width,
+                      child: Image.asset(bmiProvider.isMale ? 'assets/images/man.png' : 'assets/images/woman.png'),
+                    ),
 
-                _buildNextButton(context, bmiProvider, width)
-              ],
-            ),
+                    // Male Female Button
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+
+                        // Male Button
+                        customButton(
+                            onPressed: () {
+                              bmiProvider.getGender();
+                            },
+                            buttonTxt: AppLocalizations.of(context)!.male,
+                            icons: Icons.male,
+                            color: bmiProvider.isMale ? Colors.blue : Colors
+                                .white,
+                            width: 150,
+                            height: 56),
+
+                        // Female Button
+                        customButton(
+                            onPressed: () {
+                              bmiProvider.getGender();
+                            },
+                            buttonTxt: AppLocalizations.of(context)!.female,
+                            icons: Icons.female,
+                            color: bmiProvider.isMale ? Colors.white : Colors
+                                .pinkAccent,
+                            width: 150,
+                            height: 56
+                        ),
+                      ],
+                    ),
+                    const Spacer(),
+
+                    // Next Button
+                    customButton(
+                        onPressed: () async {
+                          Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
+                              SelectHeight(gender: bmiProvider.isMale ? 'Male' : 'Female',))
+                          );
+
+                          // Store Gender
+                          final sharedPreferences = await SharedPreferences.getInstance();
+                          await sharedPreferences.setString('gender', bmiProvider.isMale ? 'Male' : 'Female');
+                        },
+                        buttonTxt: AppLocalizations.of(context)!.nextButton,
+                        icons: Icons.skip_next,
+                        height: 56,
+                        width: width,
+                        color: Colors.amber
+                    )
+                  ],
+                ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildNextButton(BuildContext context, BMIProvider bmiProvider, double width) {
-    return customButton(
-      onPressed: () async {
-        Navigator.of(context).push(MaterialPageRoute(builder: (context) => SelectHeight( gender: bmiProvider.isMale ? 'Male' : 'Female',)));
-        /// Store Gender
-        final sharedPreferences = await SharedPreferences.getInstance();
-        await sharedPreferences.setString('gender', bmiProvider.isMale ? 'Male' : 'Female');
-      },
-      buttonTxt: AppLocalizations.of(context)!.nextButton,
-      icons: Icons.skip_next,
-      height: 56,
-      width: width,
-      color: Colors.amber);
-  }
-
-  Widget _buildMFButton(BMIProvider bmiProvider, BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        // <----------------- MALE BUTTON ----------------------->
-        customButton(
-            onPressed: () {
-              bmiProvider.getGender();
-            },
-            buttonTxt: AppLocalizations.of(context)!.male,
-            icons: Icons.male,
-            color: bmiProvider.isMale ? Colors.blue : Colors.white,
-            width: 150,
-            height: 56),
-
-        // <----------------- FEMALE BUTTON ----------------------->
-        customButton(
-            onPressed: () {
-              bmiProvider.getGender();
-            },
-            buttonTxt: AppLocalizations.of(context)!.female,
-            icons: Icons.female,
-            color: bmiProvider.isMale ? Colors.white : Colors.pinkAccent,
-            width: 150,
-            height: 56),
-      ],
-    );
-  }
-
-  Widget _buildImage(double height, double width, BMIProvider bmiProvider) {
-    return SizedBox(
-      height: height * 0.50,
-      width: width,
-      child: Image.asset(bmiProvider.isMale ? 'assets/images/man.png' : 'assets/images/woman.png'),
-    );
-  }
 }
+

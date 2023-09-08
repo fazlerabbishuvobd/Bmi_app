@@ -16,9 +16,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ResultPage extends StatefulWidget {
-  double hw;
-  double ww;
-  ResultPage({super.key, required this.hw, required this.ww});
+  final double hw;
+  final double ww;
+  const ResultPage({super.key, required this.hw, required this.ww});
 
   @override
   State<ResultPage> createState() => _ResultPageState();
@@ -53,48 +53,164 @@ class _ResultPageState extends State<ResultPage> {
     return Screenshot(
       controller: _screenshotController,
       child: Scaffold(
-        appBar: _buildAppBar(context),
+
+        appBar: AppBar(
+          title: Text(AppLocalizations.of(context)!.bmiResult,
+            style: customBodyText(Colors.white, 24, FontWeight.bold),
+          ),
+          centerTitle: true,
+          backgroundColor: AppBarTheme.of(context).backgroundColor,
+        ),
+
         body: Container(
           alignment: Alignment.center,
           padding: const EdgeInsets.all(10),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _buildCircularPercentIndicator(bmi),
+
+              // BMI Percent Indication
+              CircularPercentIndicator(
+                radius: 70.0,
+                lineWidth: 15.0,
+                percent: 0.59,
+                animation: true,
+                animationDuration: 1200,
+                center: Text("${bmi.toStringAsFixed(2)} \nKG/m2", style: customHeadingText(Colors.blueGrey, 20, FontWeight.bold), textAlign: TextAlign.center,),
+                progressColor: getColor(bmi),
+              ),
               const SizedBox(
                 height: 10,
               ),
 
-              _buildText(context, bmi),
+              // Name Result Massage Text
+              RichText(
+                text: TextSpan(
+                  text: '${AppLocalizations.of(context)!.resultMassage1} ',
+                  style: customBodyText(Colors.black, 14, FontWeight.normal),
+                  children: [
+                    TextSpan(text: _userName, style: customBodyText(Colors.black, 16, FontWeight.bold)),
+                    TextSpan(text: ' , ${AppLocalizations.of(context)!.resultMassage2} ', style: customBodyText(Colors.black, 16, FontWeight.normal)),
+                    TextSpan(text: getMassage(bmi, context), style: customBodyText(getColor(bmi), 16, FontWeight.bold)),
+                  ]
+                )
+              ),
               const SizedBox(
                 height: 10,
               ),
 
-              _buildAgeHeightWeight(context),
+
+              // Age Height Result
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  CustomContainer(
+                      text: AppLocalizations.of(context)!.resultAge,
+                      value: '$_userAge ${AppLocalizations.of(context)!.resultAgeYear}',
+                      color: Colors.amber
+                  ),
+
+                  CustomContainer(
+                      text: AppLocalizations.of(context)!.resultHeight,
+                      value: '${widget.hw.toStringAsFixed(2)} ${AppLocalizations.of(context)!.resultHeightM}',
+                      color: Colors.amber
+                  ),
+
+                  CustomContainer(
+                      text: AppLocalizations.of(context)!.resultWeight,
+                      value: '${widget.ww.toStringAsFixed(2)} ${AppLocalizations.of(context)!.resultWeightKg}',
+                      color: Colors.amber
+                  ),
+                ],
+              ),
 
               const Divider(),
               const SizedBox(
                 height: 10,
               ),
 
-              _buildChartTable(),
+              // Table Chart
+              Table(
+                border: TableBorder.all(borderRadius: BorderRadius.circular(5), color: Colors.black, width: 2),
+                children: List.generate(tableData.length, (index) {
+                return TableRow(
+                    decoration: BoxDecoration(color: tableColor[index]),
+                    children: [
+                      TableCell(child: Text('${tableData[index]['cell1']}',
+                        style: customBodyText(CupertinoColors.black, 14, FontWeight.bold),
+                        textAlign: TextAlign.center,)
+                      ),
+                      TableCell(child: Text('${tableData[index]['cell2']}',
+                        style: customBodyText(CupertinoColors.black, 14, FontWeight.normal),
+                        textAlign: TextAlign.center,)
+                      ),
+                      TableCell(child: Text('${tableData[index]['cell3']} -',
+                        style: customBodyText(CupertinoColors.black, 14, FontWeight.bold),
+                        textAlign: TextAlign.right,)
+                      ),
+                    ]);
+                }
+                ),
+              ),
               const SizedBox(
                 height: 10,
               ),
               const Divider(),
 
-              _buildNetWeight(context, bmi),
+              //NetWeight
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Text(AppLocalizations.of(context)!.netWeight,
+                    style: customHeadingText(CupertinoColors.black, 16, FontWeight.normal),),
+
+                  Text('${netWeight(bmi, widget.hw)} ${AppLocalizations.of(context)!.resultWeightKg}',
+                    style: customHeadingText(getColor(bmi), 16, FontWeight.bold),)
+                ],
+              ),
               const SizedBox(
                 height: 40,
               ),
 
 
-              // <----------------- BUTTON (HOME & SHARE) ----------------------->
+              //BUTTON (HOME & SHARE)
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildHomeButton(context),
-                  _buildShareButton(context, bmi),
+
+                  // Home Button
+                  customButton(
+                      onPressed: () {
+                        Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => const UserInfoPage(),), (route) => false);
+                      },
+                      buttonTxt: AppLocalizations.of(context)!.homeButton,
+                      icons: Icons.home_filled,
+                      color: Colors.deepPurple,
+                      height: 56),
+
+                  //Share Button
+                  GestureDetector(
+                    onTap: () {
+                      _buildShowBottomSheets(context, bmi);
+                    },
+                    child: Container(
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.symmetric(horizontal: 5),
+                      height: 56,
+                      width: 100,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.deepPurpleAccent,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.share),
+                          Text(AppLocalizations.of(context)!.shareButton),
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
               )
             ],
@@ -104,158 +220,18 @@ class _ResultPageState extends State<ResultPage> {
     );
   }
 
-  Widget _buildShareButton(BuildContext context, double bmi) {
-    return GestureDetector(
-      onTap: () {
-        showBottomSheets(context, () async {
-          String result = 'Hello, $_userName\n|| AGE: $_userAge years || HEIGHT: ${widget.hw.toStringAsFixed(2)} m || WEIGHT: ${widget.ww.toStringAsFixed(2)} KG ||\nYour BMI result is ${bmi.toStringAsFixed(2)} KG/m^2';
-          Share.share(result);
-        }, () async {
-          final tempDir = await getTemporaryDirectory();
-          final tempPath = tempDir.path;
-          final tempFile = File('$tempPath/screenshot.png');
-          final Uint8List? imageBytes = await _screenshotController.capture();
-          await tempFile.writeAsBytes(imageBytes!);
-          await Share.shareXFiles([XFile(tempFile.path)]);
-        });
-      },
-      child: Container(
-        alignment: Alignment.center,
-        padding: const EdgeInsets.symmetric(horizontal: 5),
-        height: 56,
-        width: 100,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          color: Colors.deepPurpleAccent,
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.share),
-            Text(AppLocalizations.of(context)!.shareButton),
-          ],
-        ),
-      ),
+  void _buildShowBottomSheets(BuildContext context, double bmi) {
+    return showBottomSheets(context, () async {
+      String result = 'Hello, $_userName\n|| AGE: $_userAge years || HEIGHT: ${widget.hw.toStringAsFixed(2)} m || WEIGHT: ${widget.ww.toStringAsFixed(2)} KG ||\nYour BMI result is ${bmi.toStringAsFixed(2)} KG/m^2';
+      Share.share(result);
+    }, () async {
+      final tempDir = await getTemporaryDirectory();
+      final tempPath = tempDir.path;
+      final tempFile = File('$tempPath/screenshot.png');
+      final Uint8List? imageBytes = await _screenshotController.capture();
+      await tempFile.writeAsBytes(imageBytes!);
+      await Share.shareXFiles([XFile(tempFile.path)]);
+    }
     );
-  }
-
-  Widget _buildHomeButton(BuildContext context) {
-    return customButton(
-      onPressed: () {
-        Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => const UserInfoPage(),), (route) => false);
-      },
-      buttonTxt: AppLocalizations.of(context)!.homeButton,
-      icons: Icons.home_filled,
-      color: Colors.deepPurple,
-      height: 56);
-  }
-
-  Widget _buildNetWeight(BuildContext context, double bmi) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        Text(AppLocalizations.of(context)!.netWeight,
-          style: customHeadingText(CupertinoColors.black, 16, FontWeight.normal),
-        ),
-        Text('${netWeight(bmi, widget.hw)} ${AppLocalizations.of(context)!.resultWeightKg}',
-          style: customHeadingText(getColor(bmi), 16, FontWeight.bold),
-        )
-      ],
-    );
-  }
-
-  Table _buildChartTable() {
-    return Table(
-      border: TableBorder.all(
-          borderRadius: BorderRadius.circular(5),
-          color: Colors.black,
-          width: 2),
-      children: List.generate(
-          tableData.length, (index) => TableRow(
-          decoration: BoxDecoration(color: tableColor[index]),
-          children: [
-            TableCell(
-                child: Text('${tableData[index]['cell1']}',
-              style: customBodyText(CupertinoColors.black, 14, FontWeight.bold),
-              textAlign: TextAlign.center,
-            )),
-            TableCell(
-                child: Text('${tableData[index]['cell2']}',
-              style: customBodyText(CupertinoColors.black, 14, FontWeight.normal),
-              textAlign: TextAlign.center,
-            )),
-            TableCell(
-                child: Text('${tableData[index]['cell3']} -',
-              style: customBodyText(CupertinoColors.black, 14, FontWeight.bold),
-              textAlign: TextAlign.right,
-            )),
-          ]
-        )
-      ),
-    );
-  }
-
-  Widget _buildAgeHeightWeight(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        customContainer(
-            text: AppLocalizations.of(context)!.resultAge,
-            value: '$_userAge ${AppLocalizations.of(context)!.resultAgeYear}',
-            color: Colors.amber),
-        customContainer(
-            text: AppLocalizations.of(context)!.resultHeight,
-            value: '${widget.hw.toStringAsFixed(2)} ${AppLocalizations.of(context)!.resultHeightM}',
-            color: Colors.amber),
-        customContainer(
-            text: AppLocalizations.of(context)!.resultWeight,
-            value: '${widget.ww.toStringAsFixed(2)} ${AppLocalizations.of(context)!.resultWeightKg}',
-            color: Colors.amber),
-      ],
-    );
-  }
-
-  Widget _buildText(BuildContext context, double bmi) {
-    return RichText(
-        text: TextSpan(
-            text: '${AppLocalizations.of(context)!.resultMassage1} ',
-            style: customBodyText(Colors.black, 14, FontWeight.normal),
-            children: [
-          TextSpan(
-              text: _userName,
-              style: customBodyText(Colors.black, 16, FontWeight.bold)),
-          TextSpan(text: ' , ${AppLocalizations.of(context)!.resultMassage2} ',
-              style: customBodyText(Colors.black, 16, FontWeight.normal)),
-          TextSpan(text: getMassage(bmi, context),
-              style: customBodyText(getColor(bmi), 16, FontWeight.bold)),
-        ])
-    );
-  }
-
-  CircularPercentIndicator _buildCircularPercentIndicator(double bmi) {
-    return CircularPercentIndicator(
-      radius: 70.0,
-      lineWidth: 15.0,
-      percent: 0.59,
-      animation: true,
-      animationDuration: 1200,
-      center: Text(
-        "${bmi.toStringAsFixed(2)} \nKG/m2",
-        style: customHeadingText(Colors.blueGrey, 20, FontWeight.bold),
-        textAlign: TextAlign.center,
-      ),
-      progressColor: getColor(bmi),
-    );
-  }
-
-  AppBar _buildAppBar(BuildContext context) {
-    return AppBar(
-        title: Text(AppLocalizations.of(context)!.bmiResult,
-          style: customBodyText(Colors.white, 24, FontWeight.bold),
-        ),
-        centerTitle: true,
-        backgroundColor: AppBarTheme.of(context).backgroundColor,
-      );
   }
 }

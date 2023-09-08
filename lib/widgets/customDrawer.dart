@@ -27,30 +27,31 @@ Widget customDrawer(BuildContext context) {
             ),
             const Divider(),
             const Spacer(),
-            // <----------------- Change Language & Theme ----------------------->
+
+            // Change Language & Theme
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // <----------------- Change Language ----------------------->
+
+                // Change Language
                 const Divider(),
                 Consumer<LanguageProvider>(
-                  builder: (context, _languageProvider, child) => Column(
+                  builder: (context, languageProvider, child) => Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Change Language',
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold)),
+                      const Text('Change Language', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          Text('English'),
+                          const Text('English'),
                           Switch(
-                              value: _languageProvider.value,
+                              value: languageProvider.value,
                               onChanged: (newValue) {
-                                _languageProvider.switchVal(newValue);
-                                _languageProvider.changeLanguage(newValue);
+                                languageProvider.switchVal(newValue);
+                                languageProvider.changeLanguage(newValue);
                               }),
-                          Text('বাংলা'),
+                          const Text('বাংলা'),
                         ],
                       )
                     ],
@@ -58,42 +59,43 @@ Widget customDrawer(BuildContext context) {
                 ),
                 const Divider(),
 
-                // <----------------- Theme Change ----------------------->
+                // Change Theme
                 Consumer<ThemeProvider>(
-                  builder: (context, _themeProvider, child) => Column(
+                  builder: (context, themeProvider, child) => Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text('Theme Change',
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold)),
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      //Light
                       RadioListTile(
                           title: const Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Text('Light  '),
-                              Icon(
-                                Icons.light_mode,
+                              Icon(Icons.light_mode,
                                 color: Colors.yellow,
                               )
                             ],
                           ),
                           value: ThemeMode.light,
-                          groupValue: _themeProvider.themeMode,
-                          onChanged: _themeProvider.changeTheme),
+                          groupValue: themeProvider.themeMode,
+                          onChanged: themeProvider.changeTheme),
+
+                      //Dark
                       RadioListTile(
                           title: const Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Text('Dark  '),
-                              Icon(
-                                Icons.dark_mode_outlined,
-                                color: Colors.blueGrey,
-                              )
+                              Icon(Icons.dark_mode_outlined,
+                                color: Colors.blueGrey,)
                             ],
                           ),
                           value: ThemeMode.dark,
-                          groupValue: _themeProvider.themeMode,
-                          onChanged: _themeProvider.changeTheme),
+                          groupValue: themeProvider.themeMode,
+                          onChanged: themeProvider.changeTheme),
+
+                      //System
                       RadioListTile(
                           title: const Row(
                             mainAxisAlignment: MainAxisAlignment.start,
@@ -106,8 +108,8 @@ Widget customDrawer(BuildContext context) {
                             ],
                           ),
                           value: ThemeMode.system,
-                          groupValue: _themeProvider.themeMode,
-                          onChanged: _themeProvider.changeTheme),
+                          groupValue: themeProvider.themeMode,
+                          onChanged: themeProvider.changeTheme),
                     ],
                   ),
                 ),

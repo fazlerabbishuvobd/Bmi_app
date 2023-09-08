@@ -46,7 +46,18 @@ class _UserInfoPageState extends State<UserInfoPage> {
 
     return Scaffold(
       key: _scaffoldKey,
-      appBar: _buildAppBar(context),
+
+      appBar: AppBar(
+        title: Text(AppLocalizations.of(context)!.welcome,style: customBodyText(Colors.white, 22, FontWeight.bold),),
+        centerTitle: true,
+        leading: IconButton(
+            onPressed: (){
+              _scaffoldKey.currentState!.openDrawer();
+            },
+            icon: Icon(Icons.menu_outlined, color: IconTheme.of(context).color,)
+        ),
+        backgroundColor: AppBarTheme.of(context).backgroundColor,
+      ),
 
       body: Container(
         padding: const EdgeInsets.all(10),
@@ -57,14 +68,13 @@ class _UserInfoPageState extends State<UserInfoPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(AppLocalizations.of(context)!.welcomeMessage,
-                style: customBodyText(Colors.black, 22, FontWeight.bold),
-              ),
+
+              Text(AppLocalizations.of(context)!.welcomeMessage, style: customBodyText(Colors.black, 22, FontWeight.bold),),
               const SizedBox(
                 height: 10,
               ),
 
-              // <----------------- TEXT FIELD ----------------------->
+              // TextField
               Container(
                 padding: const EdgeInsets.all(10),
                 alignment: Alignment.center,
@@ -76,12 +86,13 @@ class _UserInfoPageState extends State<UserInfoPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+
                     _buildNameTextField(context),
                     SizedBox(
                       height: height*0.02,
                     ),
-                    
                     _buildAgeTextField(context),
+
                   ],
                 ),
               ),
@@ -89,7 +100,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                 height: height*0.03,
               ),
 
-              // <----------------- BUTTON ----------------------->
+              // Button ( Clear & Submit )
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
@@ -110,19 +121,6 @@ class _UserInfoPageState extends State<UserInfoPage> {
     );
   }
 
-  AppBar _buildAppBar(BuildContext context) {
-    return AppBar(
-      title: Text(AppLocalizations.of(context)!.welcome,style: customBodyText(Colors.white, 22, FontWeight.bold),),
-      centerTitle: true,
-      leading: IconButton(
-          onPressed: (){
-            _scaffoldKey.currentState!.openDrawer();
-          },
-          icon: Icon(Icons.menu_outlined, color: IconTheme.of(context).color,)
-      ),
-      backgroundColor: AppBarTheme.of(context).backgroundColor,
-    );
-  }
 
   Widget _buildSkipButton(double height, double width, BuildContext context) {
     return Container(
